@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dropchance Editor — fleam style</title>
+<link rel="shortcut icon" href="./favicon-32x32.png" type="image/x-icon">
+<script>
+(function () {
+  try {
+    var stored = localStorage.getItem('dropchance-editor-theme');
+    var theme = (stored === 'light' || stored === 'dark')
+      ? stored
+      : (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="index.css" />
+</head>
+<body>
+<div class="app">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🌸</span>
+      <div class="brand-text">
+        <h1>Dropchance Editor <span class="version-badge">v2</span></h1>
+        <p>Petal drop-rate tables by rarity — fleam style</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button id="themeToggleBtn" class="icon-btn theme-toggle" type="button" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+
+      <div class="control-cluster">
+        <div class="field-group">
+          <label for="dropNameInput">Droprate name</label>
+          <input id="dropNameInput" type="text" value="dropchance" spellcheck="false" autocomplete="off" />
+        </div>
+
+        <div class="field-group">
+          <label for="newRaritySelect">New rarity</label>
+          <div class="new-rarity-row">
+            <select id="newRaritySelect" aria-label="Choose a rarity to create a new droprate"></select>
+            <button id="addRarityBtn" class="btn btn-accent" type="button">+ Add Droprate</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-cluster control-cluster-actions">
+        <input type="file" id="importFileInput" accept=".json,application/json" hidden />
+        <button id="importBtn" class="btn btn-ghost" type="button"><span aria-hidden="true">📂</span> Import</button>
+        <button id="previewBtn" class="btn btn-ghost" type="button" disabled><span aria-hidden="true">👁</span> Preview</button>
+        <button id="exportBtn" class="btn btn-primary" type="button" disabled><span aria-hidden="true">📥</span> Export</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <div id="emptyState" class="empty-state">
+      <div class="empty-icon" aria-hidden="true">🍃</div>
+      <p>No droprates yet. Choose a rarity above and click <strong>"+ Add Droprate"</strong> to get started.</p>
+    </div>
+
+    <p id="chainLabel" class="chain-label hidden">Rarity: High <span aria-hidden="true">→</span> Low</p>
+    <div id="rarityChain" class="rarity-chain" aria-live="polite"></div>
+  </main>
+
+  <footer class="app-footer">
+    <p>* Percentages export as 0–1 fractions (25% → 0.25); fields left at 0% are omitted, and each rarity's total is capped at 100%. Petal fields must be added explicitly per panel. Use Preview to inspect the JSON — including a name-vs-ID toggle for petal fields — before exporting.</p>
+  </footer>
+</div>
+
+<div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+<dialog id="jsonPreviewDialog" class="json-dialog" aria-labelledby="jsonDialogTitle">
+  <div class="json-dialog-header">
+    <h2 id="jsonDialogTitle">JSON Preview</h2>
+    <button type="button" class="icon-btn" id="closeJsonDialogBtn" aria-label="Close preview" title="Close">✕</button>
+  </div>
+
+  <label class="toggle-field" for="fieldKeyModeCheckbox">
+    <input type="checkbox" id="fieldKeyModeCheckbox" />
+    <span>Use rarity name for petal fields <em>(default: numeric RARITY_ID)</em></span>
+  </label>
+
+  <pre class="json-preview-pre"><code id="jsonPreviewCode" class="json-preview-code"></code></pre>
+
+  <div class="json-dialog-actions">
+    <button type="button" class="btn btn-ghost" id="copyJsonBtn">Copy to Clipboard</button>
+    <button type="button" class="btn btn-primary" id="downloadJsonFromDialogBtn">
+      <span aria-hidden="true">📥</span> Download JSON
+    </button>
+  </div>
+</dialog>
+
+<script src="editor.js" defer></script>
+</body>
+</html>
