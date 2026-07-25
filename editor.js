@@ -19,7 +19,8 @@ const RARITIES = [
   { id: 12, name: 'Ascended',    hex1: 0x9ef0ff, hex2: 0x79d9ec },
   { id: 13, name: 'Cataclysmic', hex1: 0xd83dff, hex2: 0xbe2be2 },
   { id: 14, name: 'Exalted',     hex1: 0x9999ff, hex2: 0x6666ff },
-  { id: 15, name: 'Ethereal/Eternal',    hex1: 0x009999, hex2: 0x006666 },
+  { id: 15, name: 'Ethereal',    hex1: 0x009999, hex2: 0x006666 },
+   // eternal is forging petal
   // { id: 16, name: 'Eternal',     hex1: 0xffffff, hex2: 0xcccccc },
   { id: 16, name: 'Ultimate',    hex1: 0xff7777, hex2: 0xf25e5e },
 ];
