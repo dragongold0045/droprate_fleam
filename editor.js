@@ -19,9 +19,9 @@ const RARITIES = [
   { id: 12, name: 'Ascended',    hex1: 0x9ef0ff, hex2: 0x79d9ec },
   { id: 13, name: 'Cataclysmic', hex1: 0xd83dff, hex2: 0xbe2be2 },
   { id: 14, name: 'Exalted',     hex1: 0x9999ff, hex2: 0x6666ff },
-  { id: 15, name: 'Ethereal',    hex1: 0x009999, hex2: 0x006666 },
-  { id: 16, name: 'Eternal',     hex1: 0xffffff, hex2: 0xcccccc },
-  { id: 17, name: 'Ultimate',    hex1: 0xff7777, hex2: 0xf25e5e },
+  { id: 15, name: 'Ethereal/Eternal',    hex1: 0x009999, hex2: 0x006666 },
+  // { id: 16, name: 'Eternal',     hex1: 0xffffff, hex2: 0xcccccc },
+  { id: 16, name: 'Ultimate',    hex1: 0xff7777, hex2: 0xf25e5e },
 ];
 const RARITY_BY_ID = new Map(RARITIES.map(r => [r.id, r]));
 
@@ -94,11 +94,14 @@ function idealTextColor(hex) {
   const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
   return luminance > 0.6 ? '#14171f' : '#ffffff';
 }
-function round2(n) {
-  return Math.round((n + Number.EPSILON) * 100) / 100;
+// function round2(n) {
+//   return Math.round((n + Number.EPSILON) * 100) / 100;
+// }
+function round4(n) {
+  return Math.round((n + Number.EPSILON) * 10000) / 10000;
 }
 function formatNum(n) {
-  n = round2(n);
+  n = round4(n);
   if (Number.isInteger(n)) return String(n);
   return n.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
 }
@@ -106,7 +109,7 @@ function usedIds() {
   return new Set(Object.keys(state.tables).map(Number));
 }
 function panelTotal(table) {
-  return round2(Object.values(table).reduce((a, b) => a + b, 0));
+  return round4(Object.values(table).reduce((a, b) => a + b, 0));
 }
 function sanitizeFileName(name) {
   const trimmed = (name || '').trim();
@@ -219,7 +222,7 @@ function buildDistBarHTML(table) {
 
 function buildStatsTextHTML(table) {
   const total = panelTotal(table);
-  const remaining = Math.max(0, round2(100 - total));
+  const remaining = Math.max(0, round4(100 - total));
   const html = `<span>Total: <b class="total-val">${formatNum(total)}%</b></span><span>Remaining: <b>${formatNum(remaining)}%</b></span>`;
   return { html, total };
 }
@@ -250,7 +253,7 @@ function buildFieldRowHTML(petal, val) {
       <span class="field-dot" style="background:linear-gradient(135deg, ${toCssHex(petal.hex1)}, ${toCssHex(petal.hex2)})"></span>
       <span class="field-name">${petal.name}</span>
       <span class="field-input-wrap">
-        <input type="number" class="field-input" min="0" max="100" step="0.01"
+        <input type="number" class="field-input" min="0" max="100" step="0.0001"
                placeholder="0" data-petal="${petal.id}" aria-label="${petal.name} drop chance percent"
                value="${val === 0 ? '' : val}" />
         <span class="pct-sign">%</span>
@@ -336,9 +339,9 @@ function clampValue(sourceId, petalId, rawVal) {
   const table = state.tables[sourceId];
   const val = isNaN(rawVal) ? 0 : Math.max(0, rawVal);
   const currentForThis = table[petalId] || 0;
-  const othersSum = round2(panelTotal(table) - currentForThis);
-  const maxAllowed = Math.max(0, round2(100 - othersSum));
-  return round2(Math.min(val, maxAllowed));
+  const othersSum = round4(panelTotal(table) - currentForThis);
+  const maxAllowed = Math.max(0, round4(100 - othersSum));
+  return round4(Math.min(val, maxAllowed));
 }
 
 function handleFieldInput(e) {
@@ -514,13 +517,13 @@ function parseImportedData(obj) {
       }
       const num = Number(fieldsObj[fieldKey]);
       if (!Number.isFinite(num) || num <= 0) return;
-      table[petalId] = round2(Math.min(100, num * 100));
+      table[petalId] = round4(Math.min(100, num * 100));
     });
 
     const sum = panelTotal(table);
     if (sum > 100) {
       const scale = 100 / sum;
-      Object.keys(table).forEach(k => { table[k] = round2(table[k] * scale); });
+      Object.keys(table).forEach(k => { table[k] = round4(table[k] * scale); });
     }
     tables[sourceId] = table;
   });
@@ -620,4 +623,4 @@ function init() {
   dom.chain.addEventListener('focus', handleFieldFocus, true);
 }
 
-init();
+init(); 
